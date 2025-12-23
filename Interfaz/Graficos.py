@@ -94,7 +94,7 @@ class GraficoTortaBuenosHabitos(QWidget):
         self.canvas = FigureCanvas(self.figure)
 
         # DEFINIMOS 3 COLUMNAS: [Barra Malo] - [Torta] - [Barra Bueno]
-        # width_ratios=[1, 2, 1] hace que la torta del medio sea el doble de ancha que las barras
+        # width_ratios=[1, 1.5, 1] hace que la torta del medio sea más ancha que las barras
         gs = self.figure.add_gridspec(1, 3, width_ratios=[1, 1.5, 1])
         self.ax_malo = self.figure.add_subplot(gs[0])
         self.ax_torta = self.figure.add_subplot(gs[1])
@@ -150,13 +150,13 @@ class GraficoTortaBuenosHabitos(QWidget):
         categorias_torta = ["Mejora", "Deterioro"]
         # Siempre usamos los mismos colores. Si un valor es 0, ese color no se verá.
         colors = ['#90EE90', '#FF7F7F']
-        explode = (0.05, 0)  # Separamos siempre la mejora un poco
+        explode = (0.05, 0)  # Separamos siempre el "slice" de la mejora
 
         # Calculamos el ángulo para que la línea divisoria quede siempre vertical.
         # Esta fórmula funciona incluso si uno de los valores es 0.
         angle = -180 * (valores_torta[0] / total)
 
-        # 4. Dibujar Torta (UNA SOLA VEZ)
+        # 4. Dibujar Torta
         wedges, *_ = self.ax_torta.pie(
             valores_torta,
             autopct=lambda pct: self.mostrar_porcentaje(pct, total),
@@ -185,11 +185,11 @@ class GraficoTortaBuenosHabitos(QWidget):
             self.dibujar_barra_detalle(
                 ax=self.ax_malo,
                 valores=detalle_deterioro,
-                labels=["H. Malo\nCompletado", "H. Bueno\nNo Hecho"],
+                labels=["H. Malo\nCompletado", "H. Bueno\nNo completado"],
                 color_base='#FF7F7F',
                 lado="izquierda"
             )
-        self.ax_torta.set_title("Detalle sobre tu registro de hábitos")
+        self.ax_torta.set_title("Detalle sobre los registro de hábitos")
         self.canvas.draw()
 
     @staticmethod

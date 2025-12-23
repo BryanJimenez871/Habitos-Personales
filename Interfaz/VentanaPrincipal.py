@@ -29,7 +29,7 @@ class VentanaPrincipal(QMainWindow):
         self.visualizar_habitos_join = Interfaz.VisualizarRegistros(self, self.visualizar_habitos,self.graficos.registro_grafico)
 
         self.boton_guardar_habitos = Interfaz.BotonGuardarRegistroHabitos(self.entrada_registro_habitos, self.calendario)
-        self.boton_guardar_habitos.registro_habito_agregado.connect(self.visualizar_habitos_join.agregar_registro_habito) # la misma clase que emite la señal, tiene que ser la misma clase que conecta, y conecta a la clase en donde esta la funcion/slot a realizar.
+        self.boton_guardar_habitos. registro_habito_agregado.connect(self.visualizar_habitos_join.agregar_registro_habito) # la misma clase que emite la señal, tiene que ser la misma clase que conecta, y conecta a la clase en donde esta la funcion/slot a realizar.
         self.boton_guardar_habitos.cantidad_registro_grafico.connect(self.graficos.registro_grafico.actualizar_grafico)
 
         self.visualizar_habitos.habito_selecionado.connect(self.entrada_registro_habitos.habito_rellenado)
