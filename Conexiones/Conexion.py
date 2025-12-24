@@ -5,7 +5,7 @@ from Conexiones.Logger_base import log
 class Conexion:
     _DATABASE = 'habitos_personales'
     _USERNAME = 'postgres'
-    _PASSWORD = 'bryan123456'
+    _PASSWORD = 'postgres'
     _DB_PORT = '5432'
     _HOST = '127.0.0.1'
 
