@@ -51,7 +51,7 @@ class BotonGuardarTablaHabitos(QWidget):
             MostrarMensaje(QMessageBox.Icon.Information,'Información', str(e))
 
 class BotonGuardarRegistroHabitos(QWidget):
-    registro_habito_agregado = Signal(int,int,str,datetime.date,bool)
+    registro_habito_agregado = Signal(int,int,str,int,datetime.date,bool)
     cantidad_registro_grafico = Signal()
     def __init__(self,entrada_registro,calendario):
         super().__init__()
@@ -80,14 +80,20 @@ class BotonGuardarRegistroHabitos(QWidget):
             else:
                 raise HabitoException('El habito no existe, primero tienes que crearlo.')
 
-            # Crear el objeto fecha y se insertar en la BD
-            fecha_obj = Clases.Fecha(fecha_habitos=fecha_habitos)
-            Clases_Dao.FechaDao.insertar(fecha_obj) # como esto retorna el id_fecha puedo guardarlo en una variable
+            id_fecha_existente = Clases_Dao.FechaDao.buscar_por_fecha(fecha_habitos)
+
+            if id_fecha_existente:
+                fecha_obj = Clases.Fecha(id_fecha=id_fecha_existente, fecha_habitos=fecha_habitos)
+
+            else:
+                fecha_obj = Clases.Fecha(fecha_habitos=fecha_habitos)
+                id_fecha_generado = Clases_Dao.FechaDao.insertar(fecha_obj)
+                id_fecha_existente = id_fecha_generado  # Actualizo el objeto con el id real
 
             # Insertar el registro usando los objetos ya con el 'id'
             habito_registrado = Clases.RegistroHabitos(habito=habitos_obj,fecha=fecha_obj,completado=completado)
             id_registro_habito = Clases_Dao.RegistroHabitosDao.insertar(habito_registrado) # aca va mi RegistroHabitosDao, y dentro de insertar, entra el objeto entero de Habitos, pero solo usa el registro_habito.habito.id_habito ! lo mismo con el obj de fecha
-            self.registro_habito_agregado.emit(id_registro_habito, id_habito_existente, nombre_habito,fecha_visualizacion,completado) # señal
+            self.registro_habito_agregado.emit(id_registro_habito, id_habito_existente, nombre_habito,id_fecha_existente,fecha_visualizacion,completado) # señal
             self.cantidad_registro_grafico.emit()
         except HabitoException as e:
             MostrarMensaje(QMessageBox.Icon.Critical, "Crítico", str(e)) # se usa str() ya que es 'e' vendria ser un objeto y para mostrar el mensaje legible nesitas el __str__ y eso hace el str()

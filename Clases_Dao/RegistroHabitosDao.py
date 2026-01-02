@@ -17,6 +17,7 @@ class RegistroHabitosDao:
         h.id_habito,
         h.nombre_habito,
         h.tipo_habito,
+        f.id_fecha,
         f.fecha_habitos, 
         r.completado 
     FROM registro_habitos r 
@@ -57,10 +58,10 @@ class RegistroHabitosDao:
             registro_habitos_join = []
             for registro in registros_join:
                 habito = Habitos(id_habito=registro[1], nombre_habito=registro[2], tipo_habito=registro[3])
-                fecha = Fecha(fecha_habitos= registro[4])
+                fecha = Fecha(id_fecha=registro[4],fecha_habitos= registro[5])
                 registro_habito = RegistroHabitos(
                     id_registro_habito=registro[0],
-                    completado=registro[5],
+                    completado=registro[6],
                     habito = habito,
                     fecha = fecha)
                 registro_habitos_join.append(registro_habito)

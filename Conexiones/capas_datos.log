@@ -1,3 +1,58 @@
 16/12/2025 06:51:54 PM - root - WARNING - Habito insertado: Id_Registro: None | ID Habito: Id_habito: 117 | Nombre_Habito: Opsds | Tipo Habito: None | Descripcion: None | ID Fecha: Id_fecha: 431 | Fecha: 2025-12-16 | Completado: True
 16/12/2025 06:52:58 PM - root - WARNING - Habito insertado: Id_Registro: None | ID Habito: Id_habito: 117 | Nombre_Habito: Opsds | Tipo Habito: None | Descripcion: None | ID Fecha: Id_fecha: 432 | Fecha: 2025-12-16 | Completado: True
 16/12/2025 06:53:01 PM - root - WARNING - Habito insertado: Id_Registro: None | ID Habito: Id_habito: 117 | Nombre_Habito: Opsds | Tipo Habito: None | Descripcion: None | ID Fecha: Id_fecha: 433 | Fecha: 2025-12-16 | Completado: True
+02/01/2026 05:54:06 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C92B600>
+02/01/2026 05:54:09 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001651F943C40>
+02/01/2026 05:54:10 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C995A80>
+02/01/2026 05:54:10 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C941780>
+02/01/2026 05:54:16 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C995A00>
+02/01/2026 05:54:16 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C995DC0>
+02/01/2026 05:54:17 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C995F40>
+02/01/2026 05:54:17 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C996340>
+02/01/2026 05:54:17 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C995E40>
+02/01/2026 05:54:17 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C92AE40>
+02/01/2026 05:54:17 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C996200>
+02/01/2026 05:54:17 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C9966C0>
+02/01/2026 05:54:18 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001653C996940>
+02/01/2026 06:12:32 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001E12D48E2C0>
+02/01/2026 06:15:44 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.UniqueViolation'>, duplicate key value violates unique constraint "unique_fecha"
+DETAIL:  Key (fecha_habitos)=(2026-01-02) already exists.
+, <traceback object at 0x000001FA95A96CC0>
+02/01/2026 07:17:45 PM - root - ERROR - Ocurrió una excepción: <class 'AttributeError'>, 'int' object has no attribute 'id_fecha', <traceback object at 0x0000022ABA7A8EC0>
+02/01/2026 07:27:33 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.ForeignKeyViolation'>, update or delete on table "fecha" violates foreign key constraint "registro_habitos_id_fecha_fkey" on table "registro_habitos"
+DETAIL:  Key (id_fecha)=(11) is still referenced from table "registro_habitos".
+, <traceback object at 0x000002473E0F0600>
+02/01/2026 07:28:30 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.ForeignKeyViolation'>, update or delete on table "fecha" violates foreign key constraint "registro_habitos_id_fecha_fkey" on table "registro_habitos"
+DETAIL:  Key (id_fecha)=(11) is still referenced from table "registro_habitos".
+, <traceback object at 0x000002473E10D580>
+02/01/2026 07:29:06 PM - root - ERROR - Ocurrió una excepción: <class 'psycopg2.errors.ForeignKeyViolation'>, update or delete on table "fecha" violates foreign key constraint "registro_habitos_id_fecha_fkey" on table "registro_habitos"
+DETAIL:  Key (id_fecha)=(13) is still referenced from table "registro_habitos".
+, <traceback object at 0x00000247451B15C0>

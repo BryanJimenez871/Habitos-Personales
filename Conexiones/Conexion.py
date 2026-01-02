@@ -3,9 +3,9 @@ from psycopg2 import pool
 from Conexiones.Logger_base import log
 
 class Conexion:
-    _DATABASE = 'habitos_personales'
+    _DATABASE = 'habitos_personales_prueba'
     _USERNAME = 'postgres'
-    _PASSWORD = 'postgres'
+    _PASSWORD = 'bryan123456'
     _DB_PORT = '5432'
     _HOST = '127.0.0.1'
 

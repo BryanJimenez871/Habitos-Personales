@@ -111,6 +111,7 @@ class VisualizarHabitos(QWidget):
 
     def eliminar_habito_bd(self,fila):
         id_habito = self.habitos_descripcion.item(fila,0).text() # aunque la columna id ya no se muestre para el usuario, sigue siendo muuy util seguir usando el id
+        id_fecha = self.habitos_descripcion.item(fila,1).text()
 
         Clases_Dao.RegistroHabitosDao.eliminar_id_habito(int(id_habito))  # Elimino primero el id_habito de la tabla registro_habitos
         Clases_Dao.HabitosDao.eliminar(int(id_habito))  # y ahora recién se puede eliminar el id_habito de la tabla habitos, ya que no se puede eliminar directamente porque comparten el 'foreign key'
@@ -148,11 +149,12 @@ class VisualizarRegistros(QWidget): # Cambiar el nombre a VisualizarRegistros
 
 
         self.mostrar_habitos_join = Clases_Dao.RegistroHabitosDao.seleccionar_join()
-        self.registro_habitos_join = QTableWidget(columnCount=6)
-        self.registro_habitos_join.setHorizontalHeaderLabels(['Id_registro','Id_hábito','Hábito', 'Tipo hábito', 'Fecha', 'Completado'])
+        self.registro_habitos_join = QTableWidget(columnCount=7)
+        self.registro_habitos_join.setHorizontalHeaderLabels(['Id_registro','Id_hábito','Hábito', 'Tipo hábito', 'Id_fecha', 'Fecha', 'Completado'])
         self.registro_habitos_join.verticalHeader().setVisible(False)
         self.registro_habitos_join.setColumnHidden(0, True)
         self.registro_habitos_join.setColumnHidden(1, True)
+        self.registro_habitos_join.setColumnHidden(4,False)
         self.registro_habitos_join.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers) # para que la tabla no sea editable y sea solo lectura y seleccionable
 
         self.menu_contextual = GestorMenuContextual(
@@ -165,9 +167,9 @@ class VisualizarRegistros(QWidget): # Cambiar el nombre a VisualizarRegistros
 
 
         encabezado = self.registro_habitos_join.horizontalHeader()
-        encabezado.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch) # hábito
-        encabezado.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch) # fecha
-        encabezado.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch) # completado
+        encabezado.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch) #
+        encabezado.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch) #
+        encabezado.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch) #
 
         titulo_etiqueta_tabla_registros = QLabel('Tabla de Registros')
         fuente = QFont('Calibri', 15)
@@ -189,19 +191,22 @@ class VisualizarRegistros(QWidget): # Cambiar el nombre a VisualizarRegistros
             'id_habito': registro_habito.habito.id_habito,
             'habito' : registro_habito.habito.nombre_habito,
             'tipo_habito': registro_habito.habito.tipo_habito,
+            'id_fecha': registro_habito.fecha.id_fecha,
             'fecha' : registro_habito.fecha.fecha_habitos.strftime('%d-%m-%Y'),
             'completado' : registro_habito.completado}
 
             valor = diccionario_registro_habitos['tipo_habito']
             self.insertar_fila_tabla_join(diccionario_registro_habitos, valor)
 
-    def agregar_registro_habito(self, id_registro_habito, id_habito, nombre_habito, fecha_habitos, completado):
+
+    def agregar_registro_habito(self, id_registro_habito, id_habito, nombre_habito, id_fecha,fecha_habitos, completado):
 
         nuevo_registro_habito = {
             'id_registro': id_registro_habito,
             'id_habito': id_habito,
             'habito': nombre_habito,
             'tipo_habito': None,
+            'id_fecha': id_fecha,
             'fecha': fecha_habitos,
             'completado': completado
         }
@@ -230,12 +235,28 @@ class VisualizarRegistros(QWidget): # Cambiar el nombre a VisualizarRegistros
         self.registro_habitos_join.setItem(fila, 1, f(diccionario, 'id_habito'))
         self.registro_habitos_join.setItem(fila, 2, f(diccionario, 'habito'))
         self.registro_habitos_join.setItem(fila, 3, f(diccionario, 'tipo_habito'))
-        self.registro_habitos_join.setItem(fila, 4, f(diccionario, 'fecha'))
-        self.registro_habitos_join.setItem(fila, 5, ModificarItem.completado_emoji(diccionario,'completado'))
+        self.registro_habitos_join.setItem(fila, 4, f(diccionario, 'id_fecha'))
+        self.registro_habitos_join.setItem(fila, 5, f(diccionario, 'fecha'))
+        self.registro_habitos_join.setItem(fila, 6, ModificarItem.completado_emoji(diccionario,'completado'))
 
     def eliminar_registro_habito_bd(self,fila):
         id_registro_habito = self.registro_habitos_join.item(fila,0).text() # aunque la columna id ya no se muestre para el usuario, sigue siendo muuy util seguir usando el id
+        id_fecha = self.registro_habitos_join.item(fila,4).text()
+
         Clases_Dao.RegistroHabitosDao.eliminar_id_registro(int(id_registro_habito))  # Elimino primero el id_habito de la tabla registro_habitos # y ahora recién se puede eliminar el id_habito de la tabla habitos, ya que no se puede eliminar directamente porque comparten el 'foreign key'
+
+        total = 0
+        num_filas = self.registro_habitos_join.rowCount()
+
+        # Iterar por cada fila y obtener el item de la columna id_fecha (columna 0)
+        for f in range(num_filas):
+            item = self.registro_habitos_join.item(f, 4)  # 0 es el índice de la columna
+            if id_fecha == item.text():
+                total += 1
+
+        if total == 1:
+            Clases_Dao.FechaDao.eliminar(int(id_fecha)) # acá está el problema, si hay 2 habitos que comparten la misma fecha, no se puede borrar la fecha
+
         self.registro_habitos_join.removeRow(fila)
         self.cantidad_registro_grafico.emit()
 

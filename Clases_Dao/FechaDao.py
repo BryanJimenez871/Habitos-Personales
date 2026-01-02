@@ -8,7 +8,8 @@ class FechaDao:
     _INSERTAR = 'INSERT INTO fecha(fecha_habitos) VALUES (%s) RETURNING id_fecha;'
     _ACTUALIZAR = 'UPDATE fecha SET fecha_habitos = %s WHERE id_fecha = %s;'
     _ELIMINAR = 'DELETE FROM fecha WHERE id_fecha = %s;'
-
+    _SELECCIONAR_ID_FECHA = 'SELECT id_fecha FROM fecha WHERE fecha_habitos = %s;'
+    _ELIMINAR_TODO = 'DELETE FROM fecha;'
     @classmethod
     def seleccionar(cls):
         with Cursordelpool() as cursor:
@@ -19,6 +20,16 @@ class FechaDao:
                 fecha = Fecha(registro[0], registro[1])
                 fechas.append(fecha)
         return fechas
+
+    @classmethod
+    def buscar_por_fecha(cls, fecha_habitos):
+        with Cursordelpool() as cursor:
+            cursor.execute(cls._SELECCIONAR_ID_FECHA, (fecha_habitos,))
+            row = cursor.fetchone()
+            if row:
+                return row[0]  # si existe, retorna el id_fecha
+        return None
+
     @classmethod
     def insertar(cls, fecha):
         with Cursordelpool() as cursor:
@@ -36,10 +47,16 @@ class FechaDao:
             log.debug(f'Fecha actualizada: {fecha}')
         return cursor.rowcount
     @classmethod
-    def eliminar(cls, fecha):
+    def eliminar(cls, id_fecha):
         with Cursordelpool() as cursor:
-            variable =(fecha.id_fecha,)
+            variable =(id_fecha,)
             cursor.execute(cls._ELIMINAR, variable)
-            log.debug(f'Fecha eliminada: {fecha}')
+            log.debug(f'Fecha eliminada: {id_fecha}')
         return cursor.rowcount
 
+    @classmethod
+    def eliminar_todo(cls):
+        with Cursordelpool() as cursor:
+            cursor.execute(cls._ELIMINAR_TODO)
+            log.debug(f'Se eliminó todo.')
+            return cursor.rowcount
