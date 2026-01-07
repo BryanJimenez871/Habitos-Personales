@@ -2,6 +2,7 @@ import Clases_Dao
 
 from PySide6.QtWidgets import QGridLayout, QPushButton, QHBoxLayout
 from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtCore import Qt
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -110,14 +111,26 @@ class GraficoTortaBuenosHabitos(QWidget):
         self.boton_actualizar = QPushButton("Actualizar")
         self.boton_actualizar.clicked.connect(self.actualizar_grafico_anio)
 
+        self.ver_todo = QPushButton("Desde de la creación")
+        self.ver_todo.clicked.connect(self.actualizar_grafico)
+
+
         layout_cambiar_fecha = QHBoxLayout()
         layout_cambiar_fecha.addWidget(self.cambiar_fecha)
-        layout_cambiar_fecha.addWidget(self.boton_actualizar)
+
+        layout_botones = QVBoxLayout()
+        layout_botones.addWidget(self.ver_todo)
+        layout_botones.addWidget(self.boton_actualizar)
+
+
+        layout_bottom = QHBoxLayout()
+        layout_bottom.addLayout(layout_cambiar_fecha,5)
+        layout_bottom.addLayout(layout_botones,2)
 
         # --- Layout principal ---
         layout_principal = QVBoxLayout()
         layout_principal.addWidget(self.canvas)
-        layout_principal.addLayout(layout_cambiar_fecha)
+        layout_principal.addLayout(layout_bottom)
 
         self.setLayout(layout_principal)
 
@@ -246,7 +259,7 @@ class GraficoTortaBuenosHabitos(QWidget):
         self.ax_torta.axis('off')
         self.ax_bueno.axis('off')
         fecha_inicio, fecha_fin = self.cambiar_fecha.get_anio()
-        print(fecha_inicio,fecha_fin)
+
         tabla_anio = Clases_Dao.FechaDao.seleccionar_anio(fecha_inicio,fecha_fin)
         mejora_personal = 0
         deterioro_personal = 0

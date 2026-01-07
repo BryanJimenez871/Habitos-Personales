@@ -53,24 +53,41 @@ class CambiarFecha(QWidget):
     visualizar_fecha_grafico = Signal()
     def __init__(self):
         super().__init__()
-        self.anio_combo = QComboBox()
-        self.anio_combo.addItems([str(a) for a in range(2010, 2101)])
 
+        etiqueta_anio = QLabel("Año")
+        self.anio_combo = QComboBox()
+        self.anio_combo.addItems([str(a) for a in range(2026, 2101)])
+
+        etiqueta_mes = QLabel("Mes")
         self.mes_combo = QComboBox()
         self.mes_combo.addItems([
             "Sin mes","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ])
 
+        etiqueta_dia = QLabel("Día")
         self.dia_combo = QComboBox()
         self.dia_combo.addItem(str("Sin dia"))
         self.dia_combo.addItems([str(a) for a in range(1, 32)])
 
-        layout = QHBoxLayout()
-        layout.addWidget(self.anio_combo)
-        layout.addWidget(self.mes_combo)
-        layout.addWidget(self.dia_combo)
-        self.setLayout(layout)
+        layout_anio = QVBoxLayout()
+        layout_anio.addWidget(etiqueta_anio)
+        layout_anio.addWidget(self.anio_combo)
+
+        layout_mes = QVBoxLayout()
+        layout_mes.addWidget(etiqueta_mes)
+        layout_mes.addWidget(self.mes_combo)
+
+        layout_dia = QVBoxLayout()
+        layout_dia.addWidget(etiqueta_dia)
+        layout_dia.addWidget(self.dia_combo)
+
+        layout_principal = QHBoxLayout()
+        layout_principal.addLayout(layout_anio)
+        layout_principal.addLayout(layout_mes)
+        layout_principal.addLayout(layout_dia)
+
+        self.setLayout(layout_principal)
 
     def get_anio(self):
         anio = int(self.anio_combo.currentText())
