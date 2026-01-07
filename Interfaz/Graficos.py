@@ -1,6 +1,6 @@
 import Clases_Dao
 
-from PySide6.QtWidgets import QGridLayout, QPushButton
+from PySide6.QtWidgets import QGridLayout, QPushButton, QHBoxLayout
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -108,11 +108,19 @@ class GraficoTortaBuenosHabitos(QWidget):
         self.figure.subplots_adjust(wspace=0.1)  # Un poco de espacio
 
         self.boton_actualizar = QPushButton("Actualizar")
-        self.boton_actualizar.clicked.connect(self.grafico_solo_anio)
+        self.boton_actualizar.clicked.connect(self.actualizar_grafico_anio)
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.canvas)
-        layout.addWidget(self.cambiar_fecha)
+        layout_cambiar_fecha = QHBoxLayout()
+        layout_cambiar_fecha.addWidget(self.cambiar_fecha)
+        layout_cambiar_fecha.addWidget(self.boton_actualizar)
+
+        # --- Layout principal ---
+        layout_principal = QVBoxLayout()
+        layout_principal.addWidget(self.canvas)
+        layout_principal.addLayout(layout_cambiar_fecha)
+
+        self.setLayout(layout_principal)
+
         self.grafico_torta()
 
     def grafico_torta(self):
@@ -238,7 +246,83 @@ class GraficoTortaBuenosHabitos(QWidget):
         self.ax_torta.axis('off')
         self.ax_bueno.axis('off')
         fecha_inicio, fecha_fin = self.cambiar_fecha.get_anio()
+        print(fecha_inicio,fecha_fin)
         tabla_anio = Clases_Dao.FechaDao.seleccionar_anio(fecha_inicio,fecha_fin)
+        mejora_personal = 0
+        deterioro_personal = 0
+        detalle_mejora = [0, 0]  # [Bueno Completado, Malo Evitado]
+        detalle_deterioro = [0, 0]  # [Bueno No Hecho, Malo Completado]
+
+        for registro in tabla_anio:
+            tipo = registro.habito.tipo_habito
+            completado = registro.completado
+
+            # Lógica simplificada de clasificación
+            es_mejora = (tipo == 'Es bueno' and completado) or (tipo == 'Es malo' and not completado)
+
+            if es_mejora:
+                mejora_personal += 1
+                idx = 0 if tipo == 'Es bueno' else 1
+                detalle_mejora[idx] += 1
+            else:  # Es deterioro
+                deterioro_personal += 1
+                idx = 0 if tipo == 'Es malo' else 1
+                detalle_deterioro[idx] += 1
+
+        # 3. Configuración General de la Torta
+        valores_torta = [mejora_personal, deterioro_personal]
+        total = sum(valores_torta)
+
+        # Validación de vacío
+        if total == 0:
+            self.ax_torta.text(0.5, 0.5, "Sin datos", ha='center')
+            self.canvas.draw()
+            return
+
+        categorias_torta = ["Mejora", "Deterioro"]
+        # Siempre usamos los mismos colores. Si un valor es 0, ese color no se verá.
+        colors = ['#90EE90', '#FF7F7F']
+        explode = (0.05, 0)  # Separamos siempre el "slice" de la mejora
+
+        # Calculamos el ángulo para que la línea divisoria quede siempre vertical.
+        # Esta fórmula funciona incluso si uno de los valores es 0.
+        angle = -180 * (valores_torta[0] / total)
+
+        # 4. Dibujar Torta
+        wedges, *_ = self.ax_torta.pie(
+            valores_torta,
+            autopct=lambda pct: self.mostrar_porcentaje(pct, total),
+            startangle=angle,
+            labels=categorias_torta,
+            explode=explode,
+            colors=colors
+        )
+
+        for w in wedges: w.set_edgecolor('black')
+
+        # 5. Dibujar Barras Laterales (Condicionales Independientes)
+
+        # --- Barra DERECHA (Mejora) ---
+        if mejora_personal:
+            self.dibujar_barra_detalle(
+                ax=self.ax_bueno,
+                valores=detalle_mejora,
+                labels=["H. Bueno\nCompletado", "H. Malo\nNo Completado"],
+                color_base='#90EE90',
+                lado="derecha"
+            )
+
+        # --- Barra IZQUIERDA (Deterioro) ---
+        if deterioro_personal:
+            self.dibujar_barra_detalle(
+                ax=self.ax_malo,
+                valores=detalle_deterioro,
+                labels=["H. Malo\nCompletado", "H. Bueno\nNo completado"],
+                color_base='#FF7F7F',
+                lado="izquierda"
+            )
+        self.ax_torta.set_title("Detalle sobre los registro de hábitos")
+        self.canvas.draw()
 
     @staticmethod
     def mostrar_porcentaje(pct, total_abs):
@@ -253,3 +337,10 @@ class GraficoTortaBuenosHabitos(QWidget):
         self.grafico_torta()
         self.canvas.draw()
 
+    def actualizar_grafico_anio(self):
+        print("actualizando")
+        self.ax_malo.clear()
+        self.ax_torta.clear()
+        self.ax_bueno.clear()
+        self.grafico_solo_anio()
+        self.canvas.draw()

@@ -66,14 +66,10 @@ class CambiarFecha(QWidget):
         self.dia_combo.addItem(str("Sin dia"))
         self.dia_combo.addItems([str(a) for a in range(1, 32)])
 
-        self.boton_actualizar = QPushButton("Actualizar")
-        self.boton_actualizar.clicked.connect(self.actualizar_fecha)
-
         layout = QHBoxLayout()
         layout.addWidget(self.anio_combo)
         layout.addWidget(self.mes_combo)
         layout.addWidget(self.dia_combo)
-        layout.addWidget(self.boton_actualizar)
         self.setLayout(layout)
 
     def get_anio(self):

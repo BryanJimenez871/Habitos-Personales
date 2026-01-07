@@ -1,3 +1,4 @@
+from Clases import Habitos, RegistroHabitos
 from Conexiones.Cursor_del_pool import Cursordelpool
 from Conexiones.Logger_base import log
 from Clases.Fecha import Fecha
@@ -9,7 +10,17 @@ class FechaDao:
     _ACTUALIZAR = 'UPDATE fecha SET fecha_habitos = %s WHERE id_fecha = %s;'
     _ELIMINAR = 'DELETE FROM fecha WHERE id_fecha = %s;'
     _SELECCIONAR_ID_FECHA = 'SELECT id_fecha FROM fecha WHERE fecha_habitos = %s;'
-    _SELECCIONAR_ANIO = 'SELECT fecha_habitos FROM fecha WHERE fecha_habitos >= %s AND fecha_habitos < %s '
+    _SELECCIONAR_ANIO = '''
+    SELECT 
+        h.tipo_habito,
+        r.completado,
+		f.fecha_habitos
+    FROM registro_habitos r 
+    JOIN habitos h ON r.id_habito = h.id_habito 
+	JOIN fecha f ON r.id_fecha = f.id_fecha 
+    WHERE fecha_habitos >= %s
+    AND fecha_habitos <  %s;
+    '''
     _ELIMINAR_TODO = 'DELETE FROM fecha;'
     @classmethod
     def seleccionar(cls):
@@ -26,7 +37,18 @@ class FechaDao:
     def seleccionar_anio(cls,fecha_inicio,fecha_fin):
         with Cursordelpool() as cursor:
             cursor.execute(cls._SELECCIONAR_ANIO, (fecha_inicio,fecha_fin))
-            return cursor.fetchall()
+            registros_torta = cursor.fetchall()
+            registro_habitos_torta = []
+            for registro in registros_torta:
+                habito = Habitos(tipo_habito=registro[0])
+                fecha = Fecha(fecha_habitos=registro[2])
+                registro_habito = RegistroHabitos(
+                    completado=registro[1],
+                    habito=habito,
+                    fecha=fecha)
+                registro_habitos_torta.append(registro_habito)
+
+        return registro_habitos_torta
 
     @classmethod
     def buscar_por_fecha(cls, fecha_habitos):
