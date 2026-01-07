@@ -9,6 +9,7 @@ class FechaDao:
     _ACTUALIZAR = 'UPDATE fecha SET fecha_habitos = %s WHERE id_fecha = %s;'
     _ELIMINAR = 'DELETE FROM fecha WHERE id_fecha = %s;'
     _SELECCIONAR_ID_FECHA = 'SELECT id_fecha FROM fecha WHERE fecha_habitos = %s;'
+    _SELECCIONAR_ANIO = 'SELECT fecha_habitos FROM fecha WHERE fecha_habitos >= %s AND fecha_habitos < %s '
     _ELIMINAR_TODO = 'DELETE FROM fecha;'
     @classmethod
     def seleccionar(cls):
@@ -20,6 +21,12 @@ class FechaDao:
                 fecha = Fecha(registro[0], registro[1])
                 fechas.append(fecha)
         return fechas
+
+    @classmethod
+    def seleccionar_anio(cls,fecha_inicio,fecha_fin):
+        with Cursordelpool() as cursor:
+            cursor.execute(cls._SELECCIONAR_ANIO, (fecha_inicio,fecha_fin))
+            return cursor.fetchall()
 
     @classmethod
     def buscar_por_fecha(cls, fecha_habitos):

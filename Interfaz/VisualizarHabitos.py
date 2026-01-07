@@ -154,7 +154,7 @@ class VisualizarRegistros(QWidget): # Cambiar el nombre a VisualizarRegistros
         self.registro_habitos_join.verticalHeader().setVisible(False)
         self.registro_habitos_join.setColumnHidden(0, True)
         self.registro_habitos_join.setColumnHidden(1, True)
-        self.registro_habitos_join.setColumnHidden(4,False)
+        self.registro_habitos_join.setColumnHidden(4,True)
         self.registro_habitos_join.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers) # para que la tabla no sea editable y sea solo lectura y seleccionable
 
         self.menu_contextual = GestorMenuContextual(

@@ -1,18 +1,21 @@
 import Clases_Dao
 
-from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QGridLayout, QPushButton
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
+import Interfaz
+
+
 
 class GridGraficos(QWidget):
     def __init__(self):
         super().__init__()
-
+        self.cambiar_fecha = Interfaz.CambiarFecha()
         self.torta_cantidad_habitos = GraficoTortaCantidadHabitos()
-        self.registro_grafico = GraficoTortaBuenosHabitos()
+        self.registro_grafico = GraficoTortaBuenosHabitos(self.cambiar_fecha)
 
         grid_layout = QGridLayout()
         grid_layout.addWidget(self.torta_cantidad_habitos,0,0)
@@ -27,6 +30,7 @@ class GraficoTortaCantidadHabitos(QWidget):
         self.figure = Figure(figsize=(5, 4))
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.add_subplot(111)
+
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.canvas)
@@ -87,11 +91,12 @@ class GraficoTortaCantidadHabitos(QWidget):
         self.canvas.draw()
 
 class GraficoTortaBuenosHabitos(QWidget):
-    def __init__(self):
+    def __init__(self,cambiar_fecha):
         super().__init__()
         # Aumentamos el ancho (figsize) para que quepan 3 gráficos
         self.figure = Figure(figsize=(12, 5))
         self.canvas = FigureCanvas(self.figure)
+        self.cambiar_fecha = cambiar_fecha
 
         # DEFINIMOS 3 COLUMNAS: [Barra Malo] - [Torta] - [Barra Bueno]
         # width_ratios=[1, 1.5, 1] hace que la torta del medio sea más ancha que las barras
@@ -102,8 +107,12 @@ class GraficoTortaBuenosHabitos(QWidget):
 
         self.figure.subplots_adjust(wspace=0.1)  # Un poco de espacio
 
+        self.boton_actualizar = QPushButton("Actualizar")
+        self.boton_actualizar.clicked.connect(self.grafico_solo_anio)
+
         layout = QVBoxLayout(self)
         layout.addWidget(self.canvas)
+        layout.addWidget(self.cambiar_fecha)
         self.grafico_torta()
 
     def grafico_torta(self):
@@ -224,12 +233,20 @@ class GraficoTortaBuenosHabitos(QWidget):
             fontsize='small'
         )
 
+    def grafico_solo_anio(self):
+        self.ax_malo.axis('off')
+        self.ax_torta.axis('off')
+        self.ax_bueno.axis('off')
+        fecha_inicio, fecha_fin = self.cambiar_fecha.get_anio()
+        tabla_anio = Clases_Dao.FechaDao.seleccionar_anio(fecha_inicio,fecha_fin)
+
     @staticmethod
     def mostrar_porcentaje(pct, total_abs):
         cantidad = int((pct / 100) * total_abs)
         return f"{pct:.1f}%\n({cantidad})"
 
     def actualizar_grafico(self):
+        print("actualizando")
         self.ax_malo.clear()
         self.ax_torta.clear()
         self.ax_bueno.clear()

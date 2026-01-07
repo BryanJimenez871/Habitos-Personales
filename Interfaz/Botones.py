@@ -98,6 +98,9 @@ class BotonGuardarRegistroHabitos(QWidget):
         except HabitoException as e:
             MostrarMensaje(QMessageBox.Icon.Critical, "Crítico", str(e)) # se usa str() ya que es 'e' vendria ser un objeto y para mostrar el mensaje legible nesitas el __str__ y eso hace el str()
 
+
+
+
 class MostrarMensaje(QMessageBox):
     def __init__(self, tipo_icono, titulo, mensaje):
         super().__init__()
