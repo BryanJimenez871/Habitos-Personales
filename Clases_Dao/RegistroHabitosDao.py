@@ -17,6 +17,7 @@ class RegistroHabitosDao:
         h.id_habito,
         h.nombre_habito,
         h.tipo_habito,
+        f.id_fecha,
         f.fecha_habitos, 
         r.completado 
     FROM registro_habitos r 
@@ -26,15 +27,10 @@ class RegistroHabitosDao:
     '''
     _SELECCIONAR_TORTA_GRAFICO = '''
     SELECT  
-	r.id_registro,
-    h.id_habito,
 	h.tipo_habito,
-	f.id_fecha,
-	f.fecha_habitos,
 	r.completado
     FROM registro_habitos r 
     JOIN habitos h ON r.id_habito = h.id_habito
-    JOIN fecha f ON r.id_fecha = f.id_fecha;
     '''
 
     @classmethod
@@ -57,10 +53,10 @@ class RegistroHabitosDao:
             registro_habitos_join = []
             for registro in registros_join:
                 habito = Habitos(id_habito=registro[1], nombre_habito=registro[2], tipo_habito=registro[3])
-                fecha = Fecha(fecha_habitos= registro[4])
+                fecha = Fecha(id_fecha=registro[4],fecha_habitos= registro[5])
                 registro_habito = RegistroHabitos(
                     id_registro_habito=registro[0],
-                    completado=registro[5],
+                    completado=registro[6],
                     habito = habito,
                     fecha = fecha)
                 registro_habitos_join.append(registro_habito)
@@ -73,13 +69,10 @@ class RegistroHabitosDao:
             registros_torta = cursor.fetchall()
             registro_habitos_torta = []
             for registro in registros_torta:
-                habito = Habitos(id_habito=registro[1], tipo_habito=registro[2])
-                fecha = Fecha(id_fecha=registro[3], fecha_habitos=registro[4])
+                habito = Habitos(tipo_habito=registro[0])
                 registro_habito = RegistroHabitos(
-                    id_registro_habito=registro[0],
-                    completado=registro[5],
-                    habito = habito,
-                    fecha = fecha)
+                    completado=registro[1],
+                    habito = habito)
                 registro_habitos_torta.append(registro_habito)
         return registro_habitos_torta
 

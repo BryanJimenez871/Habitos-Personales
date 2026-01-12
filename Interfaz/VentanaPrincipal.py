@@ -123,6 +123,7 @@ class VentanaPrincipal(QMainWindow):
 
         if caja_mensaje.exec() == QMessageBox.StandardButton.Yes:
             Clases_Dao.RegistroHabitosDao.eliminar_todo()
+            Clases_Dao.FechaDao.eliminar_todo()
             self.eliminar_todos_registros.emit()
 
     def eliminar_todos_los_habitos(self):
@@ -136,6 +137,7 @@ class VentanaPrincipal(QMainWindow):
         if caja_mensaje.exec() == QMessageBox.StandardButton.Yes:
             Clases_Dao.RegistroHabitosDao.eliminar_todo()
             Clases_Dao.HabitosDao.eliminar_todo()
+            Clases_Dao.FechaDao.eliminar_todo()
             self.visualizar_habitos_join.eliminar_todo()
             self.eliminar_todos_habitos.emit()
 

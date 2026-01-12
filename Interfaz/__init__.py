@@ -1,4 +1,4 @@
-from .Calendario import Calendario
+from .Calendario import Calendario, CambiarFecha
 from .EntradaDatos import EntradaRegistroHabitos, DialogoAgregarHabito
 from .Botones import BotonGuardarTablaHabitos,BotonGuardarRegistroHabitos, MostrarMensaje
 from .VisualizarHabitos import VisualizarHabitos, VisualizarRegistros

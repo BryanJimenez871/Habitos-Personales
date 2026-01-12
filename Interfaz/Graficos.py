@@ -1,18 +1,23 @@
 import Clases_Dao
 
-from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QGridLayout, QPushButton, QHBoxLayout, QMessageBox
 from PySide6.QtWidgets import QWidget, QVBoxLayout
+
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+
+import Interfaz
+from Excepciones.excepciones_personalizadas import HabitoException
+from Interfaz import MostrarMensaje
 
 
 class GridGraficos(QWidget):
     def __init__(self):
         super().__init__()
-
+        self.cambiar_fecha = Interfaz.CambiarFecha()
         self.torta_cantidad_habitos = GraficoTortaCantidadHabitos()
-        self.registro_grafico = GraficoTortaBuenosHabitos()
+        self.registro_grafico = GraficoTortaBuenosHabitos(self.cambiar_fecha)
 
         grid_layout = QGridLayout()
         grid_layout.addWidget(self.torta_cantidad_habitos,0,0)
@@ -27,6 +32,7 @@ class GraficoTortaCantidadHabitos(QWidget):
         self.figure = Figure(figsize=(5, 4))
         self.canvas = FigureCanvas(self.figure)
         self.ax = self.figure.add_subplot(111)
+
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.canvas)
@@ -87,11 +93,12 @@ class GraficoTortaCantidadHabitos(QWidget):
         self.canvas.draw()
 
 class GraficoTortaBuenosHabitos(QWidget):
-    def __init__(self):
+    def __init__(self,cambiar_fecha):
         super().__init__()
         # Aumentamos el ancho (figsize) para que quepan 3 gráficos
         self.figure = Figure(figsize=(12, 5))
         self.canvas = FigureCanvas(self.figure)
+        self.cambiar_fecha = cambiar_fecha
 
         # DEFINIMOS 3 COLUMNAS: [Barra Malo] - [Torta] - [Barra Bueno]
         # width_ratios=[1, 1.5, 1] hace que la torta del medio sea más ancha que las barras
@@ -102,8 +109,32 @@ class GraficoTortaBuenosHabitos(QWidget):
 
         self.figure.subplots_adjust(wspace=0.1)  # Un poco de espacio
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.canvas)
+        self.boton_actualizar = QPushButton("Actualizar")
+        self.boton_actualizar.clicked.connect(self.actualizar_grafico_anio)
+
+        self.ver_todo = QPushButton("Desde de la creación")
+        self.ver_todo.clicked.connect(self.actualizar_grafico)
+
+
+        layout_cambiar_fecha = QHBoxLayout()
+        layout_cambiar_fecha.addWidget(self.cambiar_fecha)
+
+        layout_botones = QVBoxLayout()
+        layout_botones.addWidget(self.ver_todo)
+        layout_botones.addWidget(self.boton_actualizar)
+
+
+        layout_bottom = QHBoxLayout()
+        layout_bottom.addLayout(layout_cambiar_fecha,5)
+        layout_bottom.addLayout(layout_botones,2)
+
+        # --- Layout principal ---
+        layout_principal = QVBoxLayout()
+        layout_principal.addWidget(self.canvas)
+        layout_principal.addLayout(layout_bottom)
+
+        self.setLayout(layout_principal)
+
         self.grafico_torta()
 
     def grafico_torta(self):
@@ -114,14 +145,50 @@ class GraficoTortaBuenosHabitos(QWidget):
 
         # 2. Obtención y Procesamiento de Datos
         tabla_registro = Clases_Dao.RegistroHabitosDao.seleccionar_grafio_torta()
+        self.mostrar_grafico(tabla_registro,"Desde el origen")
 
-        # Inicializamos contadores
+    def grafico_solo_anio(self):
+        self.ax_malo.axis('off')
+        self.ax_torta.axis('off')
+        self.ax_bueno.axis('off')
+        fecha_inicio, fecha_fin = self.cambiar_fecha.get_anio()
+        anio = fecha_inicio.year
+
+        tabla_solo_anio = Clases_Dao.FechaDao.seleccionar_fecha_rango(fecha_inicio,fecha_fin)
+        self.mostrar_grafico(tabla_solo_anio,f'Año {anio}')
+
+    def grafico_solo_mes(self):
+        self.ax_malo.axis('off')
+        self.ax_torta.axis('off')
+        self.ax_bueno.axis('off')
+        fecha_inicio, fecha_fin = self.cambiar_fecha.get_mes()
+        anio = fecha_inicio.year
+        diccionario = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio',
+                       8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}
+        mes = fecha_inicio.month
+        tabla_anio_mes = Clases_Dao.FechaDao.seleccionar_fecha_rango(fecha_inicio, fecha_fin)
+        self.mostrar_grafico(tabla_anio_mes, f'Año: {anio} | Mes: {diccionario[mes]}')
+
+    def grafico_solo_dia(self):
+        self.ax_malo.axis('off')
+        self.ax_torta.axis('off')
+        self.ax_bueno.axis('off')
+        fecha = self.cambiar_fecha.get_dia()
+        anio = fecha.year
+        diccionario = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio',
+                       8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}
+        mes = fecha.month
+        dia = fecha.day
+        tabla_anio_mes = Clases_Dao.FechaDao.seleccionar_fecha_solo_dia(fecha)
+        self.mostrar_grafico(tabla_anio_mes, f'Año: {anio} | Mes: {diccionario[mes]} | Día: {dia}')
+
+    def mostrar_grafico(self,tabla_registros,fecha):
         mejora_personal = 0
         deterioro_personal = 0
         detalle_mejora = [0, 0]  # [Bueno Completado, Malo Evitado]
         detalle_deterioro = [0, 0]  # [Bueno No Hecho, Malo Completado]
 
-        for registro in tabla_registro:
+        for registro in tabla_registros:
             tipo = registro.habito.tipo_habito
             completado = registro.completado
 
@@ -175,9 +242,9 @@ class GraficoTortaBuenosHabitos(QWidget):
             self.dibujar_barra_detalle(
                 ax=self.ax_bueno,
                 valores=detalle_mejora,
-                labels=["H. Bueno\nCompletado", "H. Malo\nNo Completado"],
+                labels=['H. Bueno\nCompletado', 'H. Malo\nNo Completado'],
                 color_base='#90EE90',
-                lado="derecha"
+                lado='derecha'
             )
 
         # --- Barra IZQUIERDA (Deterioro) ---
@@ -185,11 +252,11 @@ class GraficoTortaBuenosHabitos(QWidget):
             self.dibujar_barra_detalle(
                 ax=self.ax_malo,
                 valores=detalle_deterioro,
-                labels=["H. Malo\nCompletado", "H. Bueno\nNo completado"],
+                labels=['H. Malo\nCompletado', 'H. Bueno\nNo completado'],
                 color_base='#FF7F7F',
-                lado="izquierda"
+                lado='izquierda'
             )
-        self.ax_torta.set_title("Detalle sobre los registro de hábitos")
+        self.ax_torta.set_title(fecha)
         self.canvas.draw()
 
     @staticmethod
@@ -203,10 +270,10 @@ class GraficoTortaBuenosHabitos(QWidget):
 
         # Dibujar barras apiladas
         for j, (height, label) in enumerate((zip(ratios, labels))):
-            alpha = 0.5 + (0.4 * j) # la definicion del color, y que la clave es la j.
+            alpha = 0.5 + (0.4 * j)  # la definicion del color, y que la clave es la j.
             bc = ax.bar(0, height, width, bottom=bottom, label=label,
                         color=color_base, alpha=alpha, edgecolor='black')
-            ax.bar_label(bc, labels=[f"{valores[j]}\n({height:.0%})"], label_type='center')
+            ax.bar_label(bc, labels=[f'{valores[j]}\n({height:.0%})'], label_type='center')
             bottom += height
 
         ax.set_xlim(-0.5, 0.5)
@@ -215,24 +282,47 @@ class GraficoTortaBuenosHabitos(QWidget):
         # Leyenda
         loc_anchor = (0.7, 0.5) if lado == "derecha" else (0.3, 0.5)
         loc_align = "center left" if lado == "derecha" else "center right"
-        handles, labels_legend = ax.get_legend_handles_labels() # obtiene la leyenda tal como Matplotlib la creó
+        handles, labels_legend = ax.get_legend_handles_labels()  # obtiene la leyenda tal como Matplotlib la creó
         ax.legend(
-            handles[::-1], # como está apilado la barra y la legenda no, se muestra al revez. # EL cuadradito
-            labels_legend[::-1], # El texto
+            handles[::-1],  # como está apilado la barra y la legenda no, se muestra al revez. # EL cuadradito
+            labels_legend[::-1],  # El texto
             loc=loc_align,
             bbox_to_anchor=loc_anchor,
             fontsize='small'
         )
-
     @staticmethod
     def mostrar_porcentaje(pct, total_abs):
         cantidad = int((pct / 100) * total_abs)
         return f"{pct:.1f}%\n({cantidad})"
 
     def actualizar_grafico(self):
+        print("actualizando")
         self.ax_malo.clear()
         self.ax_torta.clear()
         self.ax_bueno.clear()
         self.grafico_torta()
         self.canvas.draw()
 
+    def actualizar_grafico_anio(self):
+        anio = self.cambiar_fecha.get_combo_anio()
+        mes = self.cambiar_fecha.get_combo_mes()
+        dia = self.cambiar_fecha.get_combo_dia()
+
+        self.ax_malo.clear()
+        self.ax_torta.clear()
+        self.ax_bueno.clear()
+
+        try:
+            if anio > 1 and mes == 0 and dia == 0:
+                self.grafico_solo_anio()
+                self.canvas.draw()
+            elif anio > 1 and mes >= 1 and dia == 0:
+                self.grafico_solo_mes()
+                self.canvas.draw()
+            elif anio > 1 and mes >= 1 and dia > 0:
+                self.grafico_solo_dia()
+                self.canvas.draw()
+            else:
+                raise HabitoException('Si quieres ver el día, te falta el mes!')
+        except HabitoException as e:
+            MostrarMensaje(QMessageBox.Icon.Information, "Información", str(e))
