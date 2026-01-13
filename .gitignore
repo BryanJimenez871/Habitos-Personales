@@ -1,0 +1,11 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# PyCharm
+.idea/
+
+# Temporales de Python
+__pycache__/
+*.py[cod]
